@@ -1,5 +1,5 @@
-// pages/api/historical-data.ts
-import type { NextApiRequest, NextApiResponse } from 'next';
+// src/app/api/historical_data/route.ts
+import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -10,14 +10,7 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432'),
 });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
+export async function GET() {
   try {
     const result = await pool.query(`
       SELECT DISTINCT ON (timestamp)
@@ -38,9 +31,12 @@ export default async function handler(
       device_id: row.device_id
     }));
 
-    res.status(200).json(formattedData);
+    return NextResponse.json(formattedData);
   } catch (error) {
     console.error('Error fetching historical data:', error);
-    res.status(500).json({ error: 'Failed to fetch historical data' });
+    return NextResponse.json(
+      { error: 'Failed to fetch historical data' },
+      { status: 500 }
+    );
   }
 }
