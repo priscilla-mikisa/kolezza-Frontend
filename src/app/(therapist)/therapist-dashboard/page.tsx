@@ -33,7 +33,7 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    const dummyTotalTherapists = 250;
+    const dummyTotalTherapists = 43;
     const dummyTotalChildren = 450;
     setTotalUsers((tLength || dummyTotalTherapists) + (cLength || dummyTotalChildren));
   }, [tLength, cLength]);
@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
     labels: ['Therapists', 'Children'],
     datasets: [
       {
-        data: [tLength || 250, cLength || 450],
+        data: [tLength || 43, cLength || 450],
         backgroundColor: ['#4CAF50', '#052049'],
         borderWidth: 0,
       },
