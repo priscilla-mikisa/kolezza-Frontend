@@ -21,6 +21,12 @@
 //   };
 // }
 
+// interface WebSocketTimeEntry {
+//   data: {
+//     elapsed_time?: [number, string][];
+//   };
+// }
+
 // const DataFilter = {
 //   ALL: "all",
 //   HISTORICAL: "historical",
@@ -91,12 +97,13 @@
 //       console.log("WebSocket data received:", data);
 
 //       if (data.data && data.data.elapsed_time) {
-//         const newLiveData = data.data.elapsed_time.map((entry: any) => ({
+//         const parsedData = data as WebSocketTimeEntry;
+//         const newLiveData = parsedData.data.elapsed_time?.map((entry) => ({
 //           ts: entry[0],
 //           values: {
 //             elapsed_time: parseFloat(entry[1]),
 //           },
-//         }));
+//         })) || [];
 
 //         setLiveData((prevData) => [...prevData, ...newLiveData]);
 //       }
@@ -196,6 +203,8 @@
 // };
 
 // export default PatientPage;
+
+
 
 "use client";
 import React, { useEffect, useState } from "react";
@@ -336,7 +345,13 @@ const PatientPage = ({ params }: { params: { id: string } }) => {
 
   const chartData = {
     labels: progressData.map((entry) =>
-      new Date(entry.ts).toLocaleString("en-US", { hour: "numeric", minute: "numeric", second: "numeric" })
+      new Date(entry.ts).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+      })
     ),
     datasets: [
       {
@@ -354,8 +369,16 @@ const PatientPage = ({ params }: { params: { id: string } }) => {
   const chartOptions = {
     responsive: true,
     scales: {
-      x: { title: { display: true, text: "Timestamp", font: { size: 16 } } },
-      y: { title: { display: true, text: "Elapsed Time (seconds)", font: { size: 16 } } },
+      x: {
+        title: { display: true, text: "Timestamp", font: { size: 16 } },
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45
+        }
+      },
+      y: { 
+        title: { display: true, text: "Elapsed Time (seconds)", font: { size: 16 } }
+      },
     },
   };
 
