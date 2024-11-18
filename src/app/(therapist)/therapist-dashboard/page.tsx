@@ -1,4 +1,5 @@
 "use client";
+import { ChartOptions, TooltipItem } from "chart.js";
 
 import React, { useState } from "react";
 import {
@@ -15,7 +16,7 @@ import { Bar, Line } from "react-chartjs-2";
 ChartJS.register(
   BarElement,
   LineElement,
-  PointElement, // Register PointElement to avoid the error
+  PointElement,
   CategoryScale,
   LinearScale,
   Tooltip
@@ -23,10 +24,7 @@ ChartJS.register(
 
 import TherapistLayout from "../TherapistLayout";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, LineElement);
-
 const Dashboard: React.FC = () => {
-  const [selectedModule, setSelectedModule] = useState<string>("Module Two");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get the current date
@@ -35,48 +33,46 @@ const Dashboard: React.FC = () => {
   // Helper function to format date as YYYY-MM-DD
   const formatDate = (date: Date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   // Generate dates for the first week of November and Week 2
-  const week1Start = new Date(today.getFullYear(), 10, 1); // November 1st (Month is 0-based)
-  const week1End = new Date(today.getFullYear(), 10, 7); // November 7th (End of Week 1)
+  const week1Start = new Date(today.getFullYear(), 10, 1);
+  const week1End = new Date(today.getFullYear(), 10, 7);
 
-  const week2Start = new Date(today.getFullYear(), 10, 8); // November 8th
-  const week2End = new Date(today.getFullYear(), 10, 14); // November 14th (End of Week 2)
+  const week2Start = new Date(today.getFullYear(), 10, 8);
+  const week2End = new Date(today.getFullYear(), 10, 14);
 
-  // Corrected Data for Weekly Active Users (Whole Numbers)
   const wauData = {
     labels: [
-      `Week 1 (${formatDate(week1Start)} - ${formatDate(week1End)})`,  // Week 1 date range
-      `Week 2 (${formatDate(week2Start)} - ${formatDate(week2End)})`,  // Week 2 date range
-      "Week 3", // Placeholder for Week 3
-      "Week 4", // Placeholder for Week 4
+      `Week 1 (${formatDate(week1Start)} - ${formatDate(week1End)})`,
+      `Week 2 (${formatDate(week2Start)} - ${formatDate(week2End)})`,
+      "Week 3",
+      "Week 4",
     ],
     datasets: [
       {
         label: "Weekly Active Users",
-        data: [1, 1, 1, 1], // One active user each week (update with actual data as needed)
-        borderColor: "#48A14D", // Green color
-        backgroundColor: "rgba(72, 161, 77, 0.2)", // Light green background
-        fill: true, // Makes the area under the line filled
-        tension: 0.3, // Smoother curve
-        pointRadius: 5, // Show points on the graph
-        pointBackgroundColor: "#48A14D", // Green points
+        data: [1, 1, 1, 1],
+        borderColor: "#48A14D",
+        backgroundColor: "rgba(72, 161, 77, 0.2)",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointBackgroundColor: "#48A14D",
       },
     ],
   };
 
-  const wauOptions = {
+  const wauOptions: ChartOptions<"line"> = {
     responsive: true,
     plugins: {
       legend: { display: true },
       tooltip: {
         callbacks: {
-          // Custom tooltip to show the exact date range on hover
-          label: (context: any) => {
+          label: (context: TooltipItem<"line">) => {
             const index = context.dataIndex;
             if (index === 0) {
               return `Active Users: ${context.raw} (${formatDate(week1Start)} - ${formatDate(week1End)})`;
@@ -94,7 +90,7 @@ const Dashboard: React.FC = () => {
         title: {
           display: true,
           text: "Weeks",
-          font: { size: 14, weight: "bold" },
+          font: { size: 14, weight: "bold" }, // Adjusted font weight to match types
           color: "#333",
         },
       },
@@ -102,28 +98,27 @@ const Dashboard: React.FC = () => {
         title: {
           display: true,
           text: "Active Users",
-          font: { size: 14, weight: "bold" },
+          font: { size: 14, weight: "bold" }, // Adjusted font weight to match types
           color: "#333",
         },
         beginAtZero: true,
-        min: 0,  // Start Y-axis from 0
-        max: 20, // Max value for Y-axis
+        min: 0,
+        max: 20,
         ticks: {
-          stepSize: 1,  // Make sure to step in whole numbers
+          stepSize: 1,
         },
       },
     },
   };
 
-  // Updated Data for Frequency of Use (for each day of the week)
   const frequencyData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
       {
         label: "Frequency of Use",
-        data: [3, 4, 2, 5, 3, 0, 1], // Interactions for each day (Mon-Sun)
-        backgroundColor: "#FF9F00", // Orange color for bars
-        barThickness: 50, // Increased bar thickness for larger bars
+        data: [3, 4, 2, 5, 3, 0, 1],
+        backgroundColor: "#FF9F00",
+        barThickness: 50,
       },
     ],
   };
@@ -132,14 +127,23 @@ const Dashboard: React.FC = () => {
     responsive: true,
     plugins: {
       legend: { display: false },
-      tooltip: { enabled: true },
+      tooltip: {
+        callbacks: {
+          label: (context: TooltipItem<"bar">) => {
+            return `Frequency: ${context.raw}`;
+          },
+        },
+      },
     },
     scales: {
       x: {
         title: {
           display: true,
           text: "Day of the Week",
-          font: { size: 14, weight: "bold" },
+          font: {
+            size: 14,
+            weight: "bold" as "bold" | "normal" | "bolder" | "lighter", // Explicitly define as valid type
+          },
           color: "#333",
         },
       },
@@ -147,25 +151,28 @@ const Dashboard: React.FC = () => {
         title: {
           display: true,
           text: "Interactions",
-          font: { size: 14, weight: "bold" },
+          font: {
+            size: 14,
+            weight: "bold" as "bold" | "normal" | "bolder" | "lighter", // Same as above
+          },
           color: "#333",
         },
         beginAtZero: true,
-        max: 6, // Set max based on the expected max interactions in a day (e.g., 5 or 6)
+        max: 6,
       },
     },
   };
+  
 
-  // Sample Data for Fluency Improvement Rate
   const fluencyData = {
-    labels: ["Week 1", "Week 2", "Week 3", "Week 4"], // Weeks
+    labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
     datasets: [
       {
         label: "Fluency Improvement Rate (%)",
-        data: [30, 40, 60, 80], // Improvement rate in percentage
-        borderColor: "#FF4500", // Red-orange color
-        backgroundColor: "rgba(255, 69, 0, 0.2)", // Light red-orange background
-        fill: true, // Area filled under the curve
+        data: [30, 40, 60, 80],
+        borderColor: "#FF4500",
+        backgroundColor: "rgba(255, 69, 0, 0.2)",
+        fill: true,
       },
     ],
   };
@@ -174,13 +181,23 @@ const Dashboard: React.FC = () => {
     responsive: true,
     plugins: {
       legend: { display: true },
+      tooltip: {
+        callbacks: {
+          label: (context: TooltipItem<"line">) => {
+            return `Improvement: ${context.raw}%`;
+          },
+        },
+      },
     },
     scales: {
       x: {
         title: {
           display: true,
           text: "Weeks",
-          font: { size: 14, weight: "bold" },
+          font: {
+            size: 14,
+            weight: "bold" as "bold" | "normal" | "bolder" | "lighter", // Explicitly cast the type
+          },
           color: "#333",
         },
       },
@@ -188,27 +205,29 @@ const Dashboard: React.FC = () => {
         title: {
           display: true,
           text: "Improvement (%)",
-          font: { size: 14, weight: "bold" },
+          font: {
+            size: 14,
+            weight: "bold" as "bold" | "normal" | "bolder" | "lighter", // Same casting
+          },
           color: "#333",
         },
         beginAtZero: true,
-        max: 100, 
+        max: 100,
         ticks: {
-          stepSize: 10,  
+          stepSize: 10,
         },
       },
     },
   };
-
- 
+  
   const speechData = {
-    labels: ["Session 1", "Session 2", "Session 3", "Session 4"], 
+    labels: ["Session 1", "Session 2", "Session 3", "Session 4"],
     datasets: [
       {
         label: "Speech Instances",
-        data: [15, 20, 18, 22], 
-        backgroundColor: "#32CD32", 
-        barThickness: 50, 
+        data: [15, 20, 18, 22],
+        backgroundColor: "#32CD32",
+        barThickness: 50,
       },
     ],
   };
@@ -217,13 +236,23 @@ const Dashboard: React.FC = () => {
     responsive: true,
     plugins: {
       legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context: TooltipItem<"bar">) => {
+            return `Instances: ${context.raw}`;
+          },
+        },
+      },
     },
     scales: {
       x: {
         title: {
           display: true,
           text: "Sessions",
-          font: { size: 14, weight: "bold" },
+          font: {
+            size: 14,
+            weight: "bold" as "bold" | "normal" | "bolder" | "lighter", // Explicitly cast to valid types
+          },
           color: "#333",
         },
       },
@@ -231,14 +260,18 @@ const Dashboard: React.FC = () => {
         title: {
           display: true,
           text: "Speech Instances",
-          font: { size: 14, weight: "bold" },
+          font: {
+            size: 14,
+            weight: "bold" as "bold" | "normal" | "bolder" | "lighter", // Same explicit cast
+          },
           color: "#333",
         },
         beginAtZero: true,
-        max: 30, 
+        max: 30,
       },
     },
   };
+  
 
   const sentences = [
     "This is a ball.",
@@ -247,7 +280,6 @@ const Dashboard: React.FC = () => {
     "This is a donkey.",
   ];
 
- 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
@@ -257,7 +289,6 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col items-center min-h-screen bg-white px-8 py-8">
         <h1 className="text-2xl font-semibold text-gray-900 mb-8">Dashboard</h1>
 
-       
         <div className="grid grid-cols-3 gap-6 mb-6 w-full max-w-5xl">
           <div className="bg-customDarkBlue text-white p-6 rounded-lg shadow-lg text-center">
             <p className="font-semibold text-3xl">Module One</p>
@@ -270,7 +301,7 @@ const Dashboard: React.FC = () => {
             <p className="text-lg font-light">Total time to complete: 30 minutes</p>
             <button
               className="mt-4 text-sm text-blue-600 underline focus:outline-none"
-              onClick={toggleModal} 
+              onClick={toggleModal}
             >
               View Sentences
             </button>
@@ -282,7 +313,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        
         <div className="grid grid-cols-1 gap-6 mb-6 w-full max-w-5xl">
           <div className="w-full">
             <h2 className="text-xl font-semibold mb-4">Number of Patients Using SawaTok</h2>
@@ -297,31 +327,32 @@ const Dashboard: React.FC = () => {
             <Line data={fluencyData} options={fluencyOptions} />
           </div>
           <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4">The Speech Instances Made by Patients</h2>
+            <h2 className="text-xl font-semibold mb-4">Speech Instance Accuracy</h2>
             <Bar data={speechData} options={speechOptions} />
           </div>
         </div>
-      </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-1/3">
-            <h3 className="text-xl font-semibold mb-4">Sentences</h3>
-            <ul>
-              {sentences.map((sentence, index) => (
-                <li key={index} className="mb-2">{sentence}</li>
-              ))}
-            </ul>
-            <button
-              className="mt-4 text-sm text-blue-600 underline focus:outline-none"
-              onClick={toggleModal} // Close the modal when clicked
-            >
-              Close
-            </button>
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-75">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold mb-4">Module Two Sentences</h3>
+              <ul className="list-disc pl-5">
+                {sentences.map((sentence, index) => (
+                  <li key={index} className="mb-2">
+                    {sentence}
+                  </li>
+                ))}
+              </ul>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={toggleModal}
+              >
+                Close
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </TherapistLayout>
   );
 };
