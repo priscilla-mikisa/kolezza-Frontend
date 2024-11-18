@@ -201,7 +201,7 @@ const PatientPage = ({ params }: { params: { id: string } }) => {
           usePointStyle: true,
           generateLabels: () => [
             { text: "0-30 mins: Good", fillStyle: "rgba(0, 128, 0, 1)" },
-            { text: "31-40 mins: Bad", fillStyle: "rgba(0, 0, 255, 1)" },
+            { text: "31-40 mins: Better", fillStyle: "rgba(0, 0, 255, 1)" },
             { text: "Above 40 mins: Critical", fillStyle: "rgba(255, 0, 0, 1)" },
           ],
         },
