@@ -21,7 +21,7 @@ const PatientDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const patientList: FetchedPatient[] = Array.isArray(patients) ? patients : [];
-  const patientsPerPage = 5;
+  const patientsPerPage = 8;
 
   const handleSearch = (e: {
     target: { value: React.SetStateAction<string> };
