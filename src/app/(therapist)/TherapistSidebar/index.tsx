@@ -33,7 +33,7 @@ const TherapistSidebar = () => {
       <nav className="flex-grow">
         <ul className="space-y-10 ml-6">
           {[
-            { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
+            { name: 'Dashboard', icon: LayoutDashboard, href: '/therapist-dashboard' },
             { name: 'Patients', icon: Users2, href: '/patients' },
             { name: 'Profile', icon: UserCircle, href: `/profile/${userId}` },
           ].map((item) => (
